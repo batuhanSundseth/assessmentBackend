@@ -16,7 +16,7 @@ const {updateListItem} = require('./controller')
 app.get("/api/compliment", getCompliment);
 app.get("/api/fortune", getFortune)
 app.post("/api/listItems", addListItem)
-app.delete("/api/listItems:id", removeListItem)
-app.put("/api/listItems:id", updateListItem)
+app.delete("/api/listItems/:id", removeListItem)
+app.put("/api/listItems/:id", updateListItem)
 
 app.listen(4000, () => console.log("Server running on 4000"));

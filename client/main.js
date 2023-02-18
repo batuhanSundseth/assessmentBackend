@@ -1,11 +1,7 @@
-const complimentBtn = document.getElementById("complimentButton")
-const fortuneBtn = document.getElementById("fortuneButton")
-const toDoList = document.getElementById("toDoList")
-const addListItemBox = document.getElementById("addListItemBox")
-const addListItemBtn = document.getElementById("addListItemButton")
-const idSelectorBox = document.getElementById("idSelectorBox")
-const deleteListItemBtn = document.getElementById("deleteListItemButton")
-const updateListItemBtn = document.getElementById("updateListItemButton")
+let complimentBtn = document.getElementById("complimentButton")
+let fortuneBtn = document.getElementById("fortuneButton")
+let form = document.getElementById("editToDoList")
+let addListItemBox = document.getElementById("addListItemBox")
 
 const getCompliment = () => {
     axios.get("http://localhost:4000/api/compliment/")
@@ -23,63 +19,62 @@ const getFortune = () => {
   });
 };
 
-const addItemSubmitHandler = (element) => {
-  element.preventDefault()
+const submitHandler = (evt) => {
+  evt.preventDefault()
 
   let bodyObj = {
-    item: addListItemBox.value
+    item: addListItemBox.value,
   }
 
   addListItem(bodyObj)
-
-  addListItemBox.value = ''
 }
 
-const removeItemSubmitHandler = (element) => {
-  element.preventDefault()
-
-  let id = idSelectorBox.value
-  removeListItem(id)
-
-  idSelectorBox.value = ''
-}
-
-const updateItemSubmitHandler = (element) => {
-  element.preventDefault()
-
-  let bodyObj = {
-    item: addListItemBox.value
-  }
-
-  let id = idSelectorBox.value
-  removeListItem(bodyObj)
-
-  idSelectorBox.value = ''
+const listItemsCallback = ({data: listItems}) => {
+  printListItems(listItems)
 }
 
 const addListItem = (body) => {
-  axios.post("http://localhost:4000/api/listItems/", body)
+  axios.post("http://localhost:4000/api/listItems", body)
     .then(res => {
-      toDoList.innerHTML = res.data
+      listItemsCallback(res)
     })
 }
 
-const removeListItem = (bodyObj) => {
-  axios.delete("http://localhost:4000/api/listItems/" + id, bodyObj)
+const removeListItem = (id) => {
+  axios.delete(`http://localhost:4000/api/listItems/${id}`)
     .then(res => {
-      toDoList.innerHTML = res.data
+      listItemsCallback(res)
     })
 }
 
-const updateListItem = (id) => {
-  axios.put("http://localhost:4000/api/listItems/" + id, id)
+const updateListItem = (id, body) => {
+  axios.put(`http://localhost:4000/api/listItems/${id}`, body)
     .then(res => {
-      toDoList.innerHTML = res.data
+      listItemsCallback(res)
     })
+}
+
+function printListItems(arr) {
+  let toDoList = document.getElementById("toDoList")
+  toDoList.innerHTML = ``
+    for (let i = 0; i < arr.length; i++) {
+        createListDisplay(arr[i])
+    }
+}
+
+function createListDisplay(item) {
+  let listItem = document.createElement('p')
+  let val = String(addListItemBox.value + ' ')
+  listItem.innerHTML =
+  `<div>
+    <p>${item.item}</p>
+    <button onClick="removeListItem(${item.id})">Delete Goal</>
+    <button onClick="updateListItem(${item.id}, ${item})">Edit Goal</>
+   </div`
+
+  toDoList.appendChild(listItem)
 }
 
 complimentBtn.addEventListener('click', getCompliment)
 fortuneBtn.addEventListener('click', getFortune)
-addListItemBtn.addEventListener('click', addItemSubmitHandler)
-deleteListItemBtn.addEventListener('click', removeListItem)
-updateListItemBtn.addEventListener('click', updateListItem)
+form.addEventListener('submit', submitHandler)

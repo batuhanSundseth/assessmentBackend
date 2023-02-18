@@ -1,5 +1,5 @@
 let listItems = []
-let globalId = 0
+let globalId = 1
 
 module.exports = {
 
@@ -30,28 +30,30 @@ module.exports = {
       }
       listItems.push(newListItem)
       globalId++
-
+      
       res.status(200).send(listItems)
     },
 
     removeListItem: (req, res) => {
-      let {id} = req.body
+      let {id} = req.params
       for (let i = 0; i < listItems.length; i++) {
-        if (listItems[i].id === id) {
+        if (listItems[i].id == id) {
           listItems.splice(i, 1)
           res.status(200).send(listItems)
           return
         }
-        res.status(400).send("Unable to remove list item")
       }
+      res.status(400).send("Unable to remove list item")
     },
 
     updateListItem: (req, res) => {
-      let {id} = req.body
-      let {item} = req.body
+      let {id} = req.params
+      let {body} = req.body
+      console.log(id)
+      console.log(body)
       for (let i = 0; i < listItems.length; i++) {
-        if (listItems[i].id === id) {
-          listItems[i].item = item
+        if (listItems[i].id == id) {
+          listItems[i].item = body
           res.status(200).send(listItems)
           return
         }
